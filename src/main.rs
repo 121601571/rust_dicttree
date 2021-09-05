@@ -18,10 +18,30 @@ impl MyTree {
         false
     }
 
-    pub fn show_all(&self)->Vec<Vec<char>>{
+    fn iter_self_values(&self)->Vec<Vec<char>>{
         let mut res = vec![];
+        match &self.suffix{
+            None => {
+                let v1 = vec![self.val];
+                res.push(v1);
+                return res;
+            }
+            Some(s1) => {
+                for i in s1{
+                    let lv1 = i.iter_self_values();
+                    for j in lv1{
+                        let mut v1 = vec![self.val];
+                        v1.extend( j );
+                        res.push(v1);
+                    }
+                }
 
 
+            }
+        }
+
+
+        res
     }
 
     fn iter_value_node(&mut self, input: char) -> &mut MyTree {
@@ -107,9 +127,13 @@ fn main() {
     let mut a = MyTree::new(' ');
     a.add_chars(vec!['a', 'b']);
     a.add_chars(vec!['a', 'c']);
-    a.add_chars(vec!['b', 'c']);
-    a.add_chars(vec!['a', 'c', 'd']);
+     a.add_chars(vec!['b', 'c']);
+
+     a.add_chars(vec!['a', 'c', 'd']);
 
     println!("{:?}", a);
     println!("{}", a.contains_whole(vec!['c', 'd', 'e']));
+    let b = a.iter_self_values();
+    println!("{:?}", b );
+
 }
