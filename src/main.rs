@@ -1,4 +1,4 @@
-use rand::{distributions::Alphanumeric, Rng}; // 0.8
+use rand::{distributions::Alphanumeric, Rng};
 
 #[derive(Debug, Clone)]
 struct MyTree {
@@ -19,7 +19,44 @@ impl MyTree {
         false
     }
 
-    fn iter_self_values(&self) -> Vec<Vec<char>> {
+    fn find_suffix(&mut self, input: Vec<char>) -> Vec<Vec<char>> {
+        let mut res = vec![];
+        if input.len() == 1 {
+            match &self.suffix {
+                None => {
+                    return res;
+                }
+                Some(sf) => {
+                    for i in sf {
+                        if i.val == input[0] {
+                            return i.iter_self_values(false);
+                        }
+                    }
+                }
+            }
+        } else {
+            let first = input[0];
+            match &self.suffix {
+                None => {
+                    return res;
+                }
+                Some(sf) => {
+                    for i in sf {
+                        if i.val == first {
+                            //
+                            let t_node = self.iter_value_node(first);
+                            let mut rest = vec![' '; input.len() - 1];
+                            rest[..].clone_from_slice(&input[1..]);
+                            return t_node.find_suffix(rest);
+                        }
+                    }
+                }
+            }
+        }
+        res
+    }
+
+    fn iter_self_values(&self, contains_self: bool) -> Vec<Vec<char>> {
         let mut res = vec![];
         match &self.suffix {
             None => {
@@ -29,7 +66,7 @@ impl MyTree {
             }
             Some(s1) => {
                 for i in s1 {
-                    let lv1 = i.iter_self_values();
+                    let lv1 = i.iter_self_values(contains_self);
                     for j in lv1 {
                         let mut v1 = vec![self.val];
                         v1.extend(j);
@@ -82,6 +119,9 @@ impl MyTree {
     pub fn add_chars(&mut self, input: Vec<char>) {
         if input.len() == 1 {
             if self.contains_value(input[0]) {
+                //mark...
+                let mut node1 = self.iter_value_node(input[0]);
+                node1.endpoint = true;
                 return;
             }
             let new_node = MyTree::new(input[0], true);
@@ -145,13 +185,23 @@ fn mass_gen(sum1: u32) -> Vec<Vec<char>> {
 
 fn main() {
     let mut a = MyTree::new(' ', true);
-    let todo = mass_gen(1000000);
-    for i in todo {
-        a.add_chars(i);
-    }
+    a.add_chars(vec!['a', 'a', 'c']);
+    a.add_chars(vec!['a', 'b', 'd']);
+    a.add_chars(vec!['a', 'b', 'e']);
+    a.add_chars(vec!['a', 'b', ]);
 
-    let target: Vec<char> = "abc".chars().collect();
-    let ok1 = a.contains_whole(target);
-    println!("{}", ok1);
+    let ll = a.find_suffix(vec!['a','b' ]);
+    println!("{:?}", ll);
+    let l2 = a.iter_self_values(true);
+    println!("{:?}", l2);
+
+
+    // let todo = mass_gen(1000000);
+    // for i in todo {
+    //     a.add_chars(i);
+    // }
+    //
+    // let target: Vec<char> = "abc".chars().collect();
+    // let ok1 = a.contains_whole(target);
+    // println!("{}", ok1);
 }
-
