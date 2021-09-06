@@ -1,5 +1,3 @@
-
-
 pub mod dict_tree {
     #[derive(Debug, Clone)]
     pub struct MyTree {
@@ -177,6 +175,4 @@ pub mod dict_tree {
             }
         }
     }
-
-
 }
